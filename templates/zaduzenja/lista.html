@@ -1,0 +1,130 @@
+{% extends 'base.html' %}
+
+{% block title %}Zaduženja{% endblock %}
+{% block page_title %}Pregled zaduženja{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h2><i class="bi bi-list-check me-2"></i>Lista zaduženja</h2>
+    <a href="{% url 'zaduzenje_novo' %}" class="btn btn-success">
+        <i class="bi bi-arrow-right-circle me-1"></i> Izdaj robu
+    </a>
+</div>
+
+<!-- Filters -->
+<div class="card mb-3">
+    <div class="card-body py-3">
+        <form method="get" class="d-flex gap-2 flex-wrap align-items-center">
+            <div style="flex:1; min-width:180px;">
+                <input type="text" name="radnik" value="{{ radnik_filter }}" class="form-control form-control-sm"
+                    placeholder="Filter po radniku...">
+            </div>
+            <div>
+                <select name="status" class="form-select form-select-sm">
+                    <option value="">Svi statusi</option>
+                    <option value="DODIJELJENO" {% if status_filter == 'DODIJELJENO' %}selected{% endif %}>Dodijeljeno
+                    </option>
+                    <option value="ZAVRSENO" {% if status_filter == 'ZAVRSENO' %}selected{% endif %}>Završeno</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary btn-sm">
+                <i class="bi bi-funnel me-1"></i>Filter
+            </button>
+            {% if status_filter or radnik_filter %}
+            <a href="{% url 'zaduzenja_lista' %}" class="btn btn-outline-secondary btn-sm">
+                <i class="bi bi-x-lg"></i> Poništi
+            </a>
+            {% endif %}
+        </form>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        Ukupno: <strong>{{ zaduzenja.count }} zaduženja</strong>
+    </div>
+    {% if zaduzenja %}
+    <div style="overflow-x:auto;">
+        <table class="table table-borderless mb-0">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Artikal</th>
+                    <th class="text-center">Kol.</th>
+                    <th>Kome dodijelio</th>
+                    <th>Datum dodjele</th>
+                    <th>Status</th>
+                    <th>Završio / Datum</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for z in zaduzenja %}
+                <tr>
+                    <td style="color:#6e7681; font-size:0.8rem">{{ z.id }}</td>
+                    <td>
+                        <div style="font-weight:500; font-size:0.88rem;">{{ z.artikal.naziv_artikla }}</div>
+                        <span class="code-badge">{{ z.artikal.random_broj }}</span>
+                    </td>
+                    <td class="text-center">
+                        <strong>{{ z.kolicina }}</strong>
+                        <span style="color:#6e7681; font-size:0.78rem;"> kom</span>
+                    </td>
+                    <td>
+                        <div style="font-weight:500; font-size:0.88rem;">{{ z.kome_izdato.username }}</div>
+                        <span
+                            class="badge {% if z.kome_izdato.role == 'ADMIN' %}badge-admin{% else %}badge-radnik{% endif %}"
+                            style="font-size:0.65rem;">
+                            {{ z.kome_izdato.get_role_display }}
+                        </span>
+                    </td>
+                    <td style="color:#8b949e; font-size:0.82rem;">
+                        {{ z.datum_dodjele|date:"d.m.Y" }}<br>
+                        <span style="color:#6e7681;">{{ z.datum_dodjele|date:"H:i" }}</span>
+                    </td>
+                    <td>
+                        <span
+                            class="badge {% if z.status == 'DODIJELJENO' %}badge-dodijeljeno{% else %}badge-zavrseno{% endif %}">
+                            {% if z.status == 'DODIJELJENO' %}
+                            <i class="bi bi-clock me-1"></i>
+                            {% else %}
+                            <i class="bi bi-check2 me-1"></i>
+                            {% endif %}
+                            {{ z.get_status_display }}
+                        </span>
+                    </td>
+                    <td style="color:#8b949e; font-size:0.82rem;">
+                        {% if z.zavrsio %}
+                        {{ z.zavrsio.username }}<br>
+                        <span style="color:#6e7681;">{{ z.datum_zavrsetka|date:"d.m.Y H:i" }}</span>
+                        {% else %}—{% endif %}
+                    </td>
+                    <td>
+                        {% if z.status == 'DODIJELJENO' %}
+                        <form method="post" action="{% url 'zaduzenje_zavrsi' z.pk %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm btn-success py-1 px-2" style="font-size:0.75rem;"
+                                onclick="return confirm('Označiti kao završeno?')">
+                                <i class="bi bi-check2-square me-1"></i>Završi
+                            </button>
+                        </form>
+                        {% else %}
+                        <span style="color:#6e7681; font-size:0.78rem;"><i class="bi bi-check-all"></i> Gotovo</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <i class="bi bi-clipboard-x"></i>
+        <p class="mb-3">Nema zaduženja za prikaz.</p>
+        <a href="{% url 'zaduzenje_novo' %}" class="btn btn-success btn-sm">
+            <i class="bi bi-arrow-right-circle me-1"></i> Izdaj robu
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

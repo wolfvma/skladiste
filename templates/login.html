@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="bs">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prijava | SkladišteApp</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #0d1117;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #e6edf3;
+        }
+
+        .login-wrap {
+            width: 100%;
+            max-width: 400px;
+            padding: 20px;
+        }
+
+        .login-logo {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .logo-icon {
+            width: 64px;
+            height: 64px;
+            background: linear-gradient(135deg, #1f6feb, #58a6ff);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            margin: 0 auto 16px;
+        }
+
+        .login-logo h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .login-logo p {
+            color: #8b949e;
+            font-size: 0.85rem;
+            margin: 4px 0 0;
+        }
+
+        .login-card {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 12px;
+            padding: 32px;
+        }
+
+        .form-control {
+            background: #0d1117;
+            border: 1px solid #30363d;
+            color: #e6edf3;
+            border-radius: 8px;
+            padding: 12px 14px;
+        }
+
+        .form-control:focus {
+            background: #0d1117;
+            border-color: #1f6feb;
+            color: #e6edf3;
+            box-shadow: 0 0 0 3px rgba(31, 111, 235, 0.2);
+        }
+
+        .form-label {
+            font-size: 0.82rem;
+            font-weight: 500;
+            color: #8b949e;
+            margin-bottom: 6px;
+        }
+
+        .btn-login {
+            background: linear-gradient(135deg, #1f6feb, #388bfd);
+            border: none;
+            color: #fff;
+            font-weight: 600;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            transition: opacity 0.2s;
+        }
+
+        .btn-login:hover {
+            opacity: 0.9;
+            color: #fff;
+        }
+
+        .alert {
+            border-radius: 8px;
+            font-size: 0.85rem;
+            background: rgba(218, 54, 51, 0.15);
+            border: 1px solid rgba(218, 54, 51, 0.4);
+            color: #f85149;
+        }
+
+        .bg-dots {
+            position: fixed;
+            inset: 0;
+            background-image: radial-gradient(circle at 1px 1px, #21262d 1px, transparent 0);
+            background-size: 24px 24px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .login-wrap {
+            position: relative;
+            z-index: 1;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="bg-dots"></div>
+    <div class="login-wrap">
+        <div class="login-logo">
+            <div class="logo-icon">
+                <i class="bi bi-box-seam text-white"></i>
+            </div>
+            <h1>SkladišteApp</h1>
+            <p>Sistem upravljanja skladištem</p>
+        </div>
+
+        <div class="login-card">
+            <h5 class="mb-4 fw-600" style="font-size:1rem; font-weight:600;">Prijava na sistem</h5>
+
+            {% if messages %}
+            {% for message in messages %}
+            <div class="alert mb-3">
+                <i class="bi bi-exclamation-triangle me-1"></i> {{ message }}
+            </div>
+            {% endfor %}
+            {% endif %}
+
+            {% if form.non_field_errors %}
+            <div class="alert mb-3">
+                <i class="bi bi-exclamation-triangle me-1"></i> Pogrešno korisničko ime ili lozinka.
+            </div>
+            {% endif %}
+
+            <form method="post" autocomplete="off">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label for="id_username" class="form-label">Korisničko ime</label>
+                    <input type="text" name="username" id="id_username"
+                        class="form-control form-control-lg {% if form.username.errors %}is-invalid{% endif %}"
+                        placeholder="Unesite korisničko ime" autofocus>
+                </div>
+                <div class="mb-4">
+                    <label for="id_password" class="form-label">Lozinka</label>
+                    <input type="password" name="password" id="id_password"
+                        class="form-control form-control-lg {% if form.password.errors %}is-invalid{% endif %}"
+                        placeholder="Unesite lozinku">
+                </div>
+                <button type="submit" class="btn btn-login w-100">
+                    <i class="bi bi-box-arrow-in-right me-2"></i>Prijavi se
+                </button>
+            </form>
+        </div>
+
+        <p class="text-center mt-3" style="color:#6e7681; font-size:0.75rem;">
+            &copy; 2026 SkladišteApp &middot; Sva prava zadržana
+        </p>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

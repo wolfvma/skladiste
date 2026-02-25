@@ -1,0 +1,158 @@
+{% extends 'base.html' %}
+
+{% block title %}Nadzorna ploča{% endblock %}
+{% block page_title %}Nadzorna ploča{% endblock %}
+
+{% block content %}
+<!-- Stat Cards -->
+<div class="row g-3 mb-4">
+    <div class="col-6 col-xl-3">
+        <div class="card stat-card h-100">
+            <div class="stat-icon" style="background:rgba(31,111,235,0.15);">
+                <i class="bi bi-boxes" style="color:#58a6ff"></i>
+            </div>
+            <div class="stat-value" style="color:#58a6ff">{{ total_artikala }}</div>
+            <div class="stat-label">Vrsta artikala</div>
+        </div>
+    </div>
+    <div class="col-6 col-xl-3">
+        <div class="card stat-card h-100">
+            <div class="stat-icon" style="background:rgba(35,134,54,0.15);">
+                <i class="bi bi-stack" style="color:#3fb950"></i>
+            </div>
+            <div class="stat-value" style="color:#3fb950">{{ ukupna_kolicina }}</div>
+            <div class="stat-label">Ukupno na stanju</div>
+        </div>
+    </div>
+    <div class="col-6 col-xl-3">
+        <div class="card stat-card h-100">
+            <div class="stat-icon" style="background:rgba(227,179,65,0.15);">
+                <i class="bi bi-clock-history" style="color:#e3b341"></i>
+            </div>
+            <div class="stat-value" style="color:#e3b341">{{ otvorena_zaduzenja }}</div>
+            <div class="stat-label">Otvorena zaduženja</div>
+        </div>
+    </div>
+    <div class="col-6 col-xl-3">
+        <div class="card stat-card h-100">
+            <div class="stat-icon" style="background:rgba(35,134,54,0.12);">
+                <i class="bi bi-check2-all" style="color:#3fb950"></i>
+            </div>
+            <div class="stat-value" style="color:#3fb950">{{ zavrsena_zaduzenja }}</div>
+            <div class="stat-label">Završena zaduženja</div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick actions -->
+<div class="row g-3 mb-4">
+    <div class="col-12">
+        <div class="d-flex gap-2 flex-wrap">
+            <a href="{% url 'artikal_unos' %}" class="btn btn-primary">
+                <i class="bi bi-plus-circle me-1"></i> Unesi robu
+            </a>
+            <a href="{% url 'zaduzenje_novo' %}" class="btn btn-success">
+                <i class="bi bi-arrow-right-circle me-1"></i> Izdaj robu
+            </a>
+            <a href="{% url 'zaduzenja_lista' %}?status=DODIJELJENO" class="btn btn-outline-warning btn-sm"
+                style="font-size:.82rem;">
+                <i class="bi bi-clock-history me-1"></i> Otvorena zaduženja
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3">
+    <!-- Recent articles -->
+    <div class="col-lg-6">
+        <div class="card h-100">
+            <div class="card-header d-flex align-items-center justify-content-between">
+                <span><i class="bi bi-boxes me-2 text-primary"></i>Posljednji artikli</span>
+                <a href="{% url 'artikli_lista' %}" class="text-muted"
+                    style="font-size:0.78rem; text-decoration:none;">Svi artikli →</a>
+            </div>
+            <div class="card-body p-0">
+                {% if posljednji_artikli %}
+                <table class="table table-borderless mb-0">
+                    <thead>
+                        <tr>
+                            <th>Artikal</th>
+                            <th>Stanje</th>
+                            <th>Unio</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for a in posljednji_artikli %}
+                        <tr>
+                            <td>
+                                <div style="font-weight:500; font-size:0.85rem">{{ a.naziv_artikla }}</div>
+                                <span class="code-badge">{{ a.random_broj }}</span>
+                            </td>
+                            <td>
+                                <span
+                                    style="font-weight:600; color:{% if a.kolicina == 0 %}#f85149{% elif a.kolicina < 5 %}#e3b341{% else %}#3fb950{% endif %}">
+                                    {{ a.kolicina }} kom
+                                </span>
+                            </td>
+                            <td style="color:#8b949e; font-size:0.82rem">{{ a.unio.username }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <div class="empty-state">
+                    <i class="bi bi-inbox"></i>
+                    <p>Nema unesenih artikala.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent assignments -->
+    <div class="col-lg-6">
+        <div class="card h-100">
+            <div class="card-header d-flex align-items-center justify-content-between">
+                <span><i class="bi bi-list-check me-2 text-success"></i>Posljednja zaduženja</span>
+                <a href="{% url 'zaduzenja_lista' %}" class="text-muted"
+                    style="font-size:0.78rem; text-decoration:none;">Sva zaduženja →</a>
+            </div>
+            <div class="card-body p-0">
+                {% if posljednja_zaduzenja %}
+                <table class="table table-borderless mb-0">
+                    <thead>
+                        <tr>
+                            <th>Artikal</th>
+                            <th>Radnik</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for z in posljednja_zaduzenja %}
+                        <tr>
+                            <td>
+                                <div style="font-weight:500; font-size:0.85rem">{{ z.artikal.naziv_artikla }}</div>
+                                <span style="color:#8b949e; font-size:0.78rem">{{ z.kolicina }} kom</span>
+                            </td>
+                            <td style="font-size:0.85rem">{{ z.kome_izdato.username }}</td>
+                            <td>
+                                <span
+                                    class="badge {% if z.status == 'DODIJELJENO' %}badge-dodijeljeno{% else %}badge-zavrseno{% endif %}">
+                                    {{ z.get_status_display }}
+                                </span>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <div class="empty-state">
+                    <i class="bi bi-clipboard-x"></i>
+                    <p>Nema zaduženja.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

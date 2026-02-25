@@ -1,0 +1,139 @@
+{% extends 'base.html' %}
+
+{% block title %}Izdaj robu{% endblock %}
+{% block page_title %}Izdavanje robe{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h2><i class="bi bi-arrow-right-circle me-2"></i>Dodijeli robu radniku</h2>
+    <a href="{% url 'zaduzenja_lista' %}" class="btn btn-outline-secondary btn-sm">
+        <i class="bi bi-arrow-left me-1"></i> Nazad
+    </a>
+</div>
+
+<div class="row">
+    <div class="col-lg-7 col-xl-6">
+        <div class="card">
+            <div class="card-header">
+                <i class="bi bi-arrow-right-circle me-2"></i>Forma za dodjelu
+            </div>
+            <div class="card-body p-4">
+                <form method="post" id="zaduzenjeForm">
+                    {% csrf_token %}
+
+                    <div class="mb-4">
+                        <label for="{{ form.artikal.id_for_label }}" class="form-label">Artikal</label>
+                        {{ form.artikal }}
+                        {% if form.artikal.errors %}
+                        <div class="text-danger mt-1" style="font-size:0.8rem;">{% for e in form.artikal.errors %}{{ e
+                            }}{% endfor %}</div>
+                        {% endif %}
+                        <div class="mt-1" id="stockInfo" style="font-size:0.8rem; color:#8b949e;"></div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="{{ form.kolicina.id_for_label }}" class="form-label">Količina</label>
+                        {{ form.kolicina }}
+                        {% if form.kolicina.errors %}
+                        <div class="text-danger mt-1" style="font-size:0.8rem;">{% for e in form.kolicina.errors %}{{ e
+                            }}{% endfor %}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="{{ form.kome_izdato.id_for_label }}" class="form-label">Kome dodijeliti</label>
+                        {{ form.kome_izdato }}
+                        {% if form.kome_izdato.errors %}
+                        <div class="text-danger mt-1" style="font-size:0.8rem;">{% for e in form.kome_izdato.errors %}{{
+                            e }}{% endfor %}</div>
+                        {% endif %}
+                    </div>
+
+                    {% if form.non_field_errors %}
+                    <div class="alert alert-danger mb-3">
+                        {% for e in form.non_field_errors %}{{ e }}{% endfor %}
+                    </div>
+                    {% endif %}
+
+                    <div class="divider"></div>
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-success px-4">
+                            <i class="bi bi-send me-1"></i> Dodijeli
+                        </button>
+                        <a href="{% url 'zaduzenja_lista' %}" class="btn btn-outline-secondary">Odustani</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-5 col-xl-6 mt-3 mt-lg-0">
+        <div class="card">
+            <div class="card-header"><i class="bi bi-info-circle me-2"></i>Info</div>
+            <div class="card-body p-4">
+                <div class="d-flex gap-2 mb-3">
+                    <i class="bi bi-1-circle text-primary mt-1" style="flex-shrink:0;"></i>
+                    <div style="font-size:0.85rem;">
+                        <strong>Odaberite artikal</strong>
+                        <p style="color:#8b949e; margin:2px 0 0; font-size:0.8rem;">Prikazuju se samo artikli koji imaju
+                            stanje > 0</p>
+                    </div>
+                </div>
+                <div class="d-flex gap-2 mb-3">
+                    <i class="bi bi-2-circle text-primary mt-1" style="flex-shrink:0;"></i>
+                    <div style="font-size:0.85rem;">
+                        <strong>Unesite količinu</strong>
+                        <p style="color:#8b949e; margin:2px 0 0; font-size:0.8rem;">Ne može biti veća od stanja na
+                            skladištu</p>
+                    </div>
+                </div>
+                <div class="d-flex gap-2">
+                    <i class="bi bi-3-circle text-primary mt-1" style="flex-shrink:0;"></i>
+                    <div style="font-size:0.85rem;">
+                        <strong>Odaberite radnika</strong>
+                        <p style="color:#8b949e; margin:2px 0 0; font-size:0.8rem;">Sistem će kreirati zaduženje i
+                            smanjiti stanje u skladištu</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    // Artikal data for stock display
+    const artikalData = {
+    {% for a in form.fields.artikal.queryset %}
+    { { a.id } }: { naziv: "{{ a.naziv_artikla|escapejs }}", stanje: { { a.kolicina } } },
+    {% endfor %}
+};
+
+    const select = document.getElementById('{{ form.artikal.id_for_label }}');
+    const stockInfo = document.getElementById('stockInfo');
+    const kolicina = document.getElementById('{{ form.kolicina.id_for_label }}');
+
+    function updateStockInfo() {
+        const val = select.value;
+        if (val && artikalData[val]) {
+            const item = artikalData[val];
+            stockInfo.innerHTML = `<i class="bi bi-box-seam me-1"></i>Stanje na skladištu: <strong style="color:${item.stanje < 5 ? '#e3b341' : '#3fb950'}">${item.stanje} kom</strong>`;
+            kolicina.max = item.stanje;
+        } else {
+            stockInfo.innerHTML = '';
+        }
+    }
+
+    select.addEventListener('change', updateStockInfo);
+    updateStockInfo();
+
+    // Pre-select artikal from URL param
+    const urlParams = new URLSearchParams(window.location.search);
+    const artikalId = urlParams.get('artikal');
+    if (artikalId && select) {
+        select.value = artikalId;
+        updateStockInfo();
+    }
+</script>
+{% endblock %}

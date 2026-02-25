@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+{% block title %}Potvrda brisanja dobavljača{% endblock %}
+{% block page_title %}Brisanje dobavljača{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-5">
+        <div class="card">
+            <div class="card-header" style="border-color: rgba(218,54,51,0.4); color: #f85149;">
+                <i class="bi bi-exclamation-triangle me-2"></i>Potvrda brisanja
+            </div>
+            <div class="card-body p-4 text-center">
+                <div
+                    style="width:60px; height:60px; background:rgba(218,54,51,0.15); border:1px solid rgba(218,54,51,0.4); border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 20px; font-size:1.5rem; color:#f85149;">
+                    <i class="bi bi-truck"></i>
+                </div>
+                <h5 class="mb-2">Brisanje dobavljača</h5>
+                <p style="color:#8b949e; font-size:0.9rem; margin-bottom:6px;">Jeste li sigurni da želite obrisati
+                    dobavljača:</p>
+                <p class="mb-1">
+                    <strong style="font-size:1.1rem; color:#e6edf3;">{{ dobavljac.naziv_firme }}</strong>
+                </p>
+                {% if dobavljac.kontakt_osoba %}
+                <p style="color:#8b949e; font-size:0.85rem; margin-bottom:16px;">{{ dobavljac.kontakt_osoba }}</p>
+                {% endif %}
+
+                {% if dobavljac.artikli.count > 0 %}
+                <div class="alert mb-4"
+                    style="background:rgba(227,179,65,0.1); border:1px solid rgba(227,179,65,0.3); color:#e3b341; font-size:0.83rem; text-align:left;">
+                    <i class="bi bi-exclamation-triangle me-1"></i>
+                    Ovaj dobavljač ima <strong>{{ dobavljac.artikli.count }} artikala</strong> u skladištu.
+                    Brisanjem dobavljača, artikli ostaju ali <strong>gube vezu sa dobavljačem</strong>.
+                </div>
+                {% endif %}
+
+                <div class="alert mb-4"
+                    style="background:rgba(218,54,51,0.1); border:1px solid rgba(218,54,51,0.3); color:#f85149; font-size:0.83rem; text-align:left;">
+                    <i class="bi bi-exclamation-triangle me-1"></i>
+                    Ova akcija je <strong>nepovratna</strong>.
+                </div>
+
+                <form method="post" class="d-flex gap-2 justify-content-center">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger px-4">
+                        <i class="bi bi-trash me-1"></i>Da, obriši
+                    </button>
+                    <a href="{% url 'dobavljac_detalj' dobavljac.pk %}" class="btn btn-outline-secondary">
+                        Odustani
+                    </a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

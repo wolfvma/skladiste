@@ -1,0 +1,137 @@
+{% extends 'base.html' %}
+
+{% block title %}Dobavljači{% endblock %}
+{% block page_title %}Dobavljači{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h2><i class="bi bi-truck me-2"></i>Lista dobavljača</h2>
+    <a href="{% url 'dobavljac_novi' %}" class="btn btn-primary">
+        <i class="bi bi-plus-circle me-1"></i> Novi dobavljač
+    </a>
+</div>
+
+<!-- Search & Filter -->
+<div class="card mb-3">
+    <div class="card-body py-3">
+        <form method="get" class="d-flex gap-2 flex-wrap align-items-center">
+            <div style="flex:1; min-width:220px;">
+                <input type="text" name="q" value="{{ q }}" class="form-control"
+                    placeholder="Pretraži po nazivu, kontaktu, gradu, opisu...">
+            </div>
+            <div>
+                <select name="aktivan" class="form-select">
+                    <option value="">Svi statusi</option>
+                    <option value="1" {% if aktivan_filter == '1' %}selected{% endif %}>Aktivni</option>
+                    <option value="0" {% if aktivan_filter == '0' %}selected{% endif %}>Neaktivni</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary px-4">
+                <i class="bi bi-search"></i>
+            </button>
+            {% if q or aktivan_filter %}
+            <a href="{% url 'dobavljaci_lista' %}" class="btn btn-outline-secondary">
+                <i class="bi bi-x-lg"></i>
+            </a>
+            {% endif %}
+        </form>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        Ukupno: <strong>{{ dobavljaci.count }} dobavljača</strong>
+    </div>
+    {% if dobavljaci %}
+    <div style="overflow-x:auto;">
+        <table class="table table-borderless mb-0">
+            <thead>
+                <tr>
+                    <th>Naziv firme</th>
+                    <th>Kontakt</th>
+                    <th>Telefon</th>
+                    <th>Email</th>
+                    <th>Šta nabavljamo</th>
+                    <th>Artikli</th>
+                    <th>Status</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for d in dobavljaci %}
+                <tr>
+                    <td>
+                        <a href="{% url 'dobavljac_detalj' d.pk %}"
+                            style="font-weight:600; font-size:0.9rem; color:#58a6ff; text-decoration:none;">
+                            {{ d.naziv_firme }}
+                        </a>
+                        {% if d.grad %}<br><span style="color:#6e7681; font-size:0.75rem;">{{ d.grad }}, {{ d.drzava
+                            }}</span>{% endif %}
+                    </td>
+                    <td style="font-size:0.85rem;">{{ d.kontakt_osoba|default:"—" }}</td>
+                    <td style="font-size:0.85rem;">
+                        {% if d.telefon %}
+                        <a href="tel:{{ d.telefon }}" style="color:#8b949e; text-decoration:none;">{{ d.telefon }}</a>
+                        {% else %}—{% endif %}
+                    </td>
+                    <td style="font-size:0.82rem;">
+                        {% if d.email %}
+                        <a href="mailto:{{ d.email }}" style="color:#58a6ff; text-decoration:none;">{{ d.email }}</a>
+                        {% else %}—{% endif %}
+                    </td>
+                    <td style="font-size:0.82rem; color:#8b949e; max-width:200px;">
+                        {% if d.opis %}
+                        <span title="{{ d.opis }}">{{ d.opis|truncatechars:60 }}</span>
+                        {% else %}—{% endif %}
+                    </td>
+                    <td class="text-center">
+                        <span style="font-weight:600; color:#58a6ff;">{{ d.artikli.count }}</span>
+                        <span style="color:#6e7681; font-size:0.75rem;"> art.</span>
+                    </td>
+                    <td>
+                        {% if d.aktivan %}
+                        <span class="badge"
+                            style="background:rgba(35,134,54,0.15); color:#3fb950; border:1px solid rgba(35,134,54,0.4); font-size:0.7rem;">
+                            <i class="bi bi-circle-fill me-1" style="font-size:0.45rem;"></i>Aktivan
+                        </span>
+                        {% else %}
+                        <span class="badge"
+                            style="background:rgba(218,54,51,0.12); color:#f85149; border:1px solid rgba(218,54,51,0.3); font-size:0.7rem;">
+                            <i class="bi bi-circle-fill me-1" style="font-size:0.45rem;"></i>Neaktivan
+                        </span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div class="d-flex gap-1">
+                            <a href="{% url 'dobavljac_detalj' d.pk %}"
+                                class="btn btn-sm btn-outline-secondary py-1 px-2" title="Detalji"
+                                style="font-size:0.72rem;">
+                                <i class="bi bi-eye"></i>
+                            </a>
+                            <a href="{% url 'dobavljac_izmijeni' d.pk %}"
+                                class="btn btn-sm btn-outline-primary py-1 px-2" title="Izmijeni"
+                                style="font-size:0.72rem;">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                            <a href="{% url 'dobavljac_obrisi' d.pk %}" class="btn btn-sm btn-outline-danger py-1 px-2"
+                                title="Obriši" style="font-size:0.72rem;">
+                                <i class="bi bi-trash"></i>
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <i class="bi bi-truck"></i>
+        <p class="mb-3">Nema dobavljača.{% if q %} Nema rezultata za "{{ q }}".{% endif %}</p>
+        <a href="{% url 'dobavljac_novi' %}" class="btn btn-primary btn-sm">
+            <i class="bi bi-plus-circle me-1"></i> Dodaj prvog dobavljača
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

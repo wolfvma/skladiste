@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="bs">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Skladište{% endblock %} | SkladišteApp</title>
+    <meta name="description" content="Sistem za upravljanje skladištem i evidenciju robe">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --sidebar-width: 260px;
+            --sidebar-bg: #0d1117;
+            --sidebar-border: #30363d;
+            --sidebar-hover: #161b22;
+            --sidebar-active: #1f6feb;
+            --accent: #238636;
+            --accent-hover: #2ea043;
+            --danger: #da3633;
+            --warning: #e3b341;
+            --body-bg: #0d1117;
+            --card-bg: #161b22;
+            --card-border: #30363d;
+            --text-primary: #e6edf3;
+            --text-secondary: #8b949e;
+            --text-muted: #6e7681;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--body-bg);
+            color: var(--text-primary);
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        /* ── SIDEBAR ── */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: var(--sidebar-width);
+            height: 100vh;
+            background: var(--sidebar-bg);
+            border-right: 1px solid var(--sidebar-border);
+            display: flex;
+            flex-direction: column;
+            z-index: 1000;
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar-brand {
+            padding: 20px 20px 16px;
+            border-bottom: 1px solid var(--sidebar-border);
+        }
+
+        .sidebar-brand h5 {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: #fff;
+            margin: 0;
+            letter-spacing: 0.5px;
+        }
+
+        .sidebar-brand small {
+            color: var(--text-muted);
+            font-size: 0.75rem;
+        }
+
+        .brand-icon {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, #1f6feb, #58a6ff);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 8px;
+        }
+
+        .sidebar-nav {
+            flex: 1;
+            padding: 12px 0;
+            overflow-y: auto;
+        }
+
+        .nav-section-title {
+            font-size: 0.67rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            padding: 12px 20px 6px;
+        }
+
+        .sidebar-nav .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 9px 20px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.875rem;
+            font-weight: 400;
+            border-radius: 0;
+            transition: all 0.15s ease;
+            margin: 1px 8px;
+            border-radius: 6px;
+        }
+
+        .sidebar-nav .nav-link:hover {
+            color: var(--text-primary);
+            background: var(--sidebar-hover);
+        }
+
+        .sidebar-nav .nav-link.active {
+            color: #fff;
+            background: var(--sidebar-active);
+            font-weight: 500;
+        }
+
+        .sidebar-nav .nav-link .bi {
+            font-size: 1rem;
+            width: 18px;
+            flex-shrink: 0;
+        }
+
+        .sidebar-footer {
+            padding: 16px;
+            border-top: 1px solid var(--sidebar-border);
+        }
+
+        .user-card {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .user-avatar {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .avatar-admin {
+            background: linear-gradient(135deg, #1f6feb, #58a6ff);
+            color: #fff;
+        }
+
+        .avatar-radnik {
+            background: linear-gradient(135deg, #238636, #3fb950);
+            color: #fff;
+        }
+
+        .user-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .user-info .name {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .user-info .role-badge {
+            font-size: 0.68rem;
+            color: var(--text-muted);
+        }
+
+        /* ── MAIN CONTENT ── */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .topbar {
+            background: var(--card-bg);
+            border-bottom: 1px solid var(--card-border);
+            padding: 16px 28px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .topbar h1 {
+            font-size: 1.15rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin: 0;
+        }
+
+        .page-content {
+            flex: 1;
+            padding: 28px;
+        }
+
+        /* ── CARDS ── */
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 10px;
+            color: var(--text-primary);
+        }
+
+        .card-header {
+            background: transparent;
+            border-bottom: 1px solid var(--card-border);
+            padding: 14px 18px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .stat-card {
+            border-radius: 12px;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            margin-bottom: 12px;
+        }
+
+        .stat-card .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            line-height: 1;
+            margin-bottom: 4px;
+        }
+
+        .stat-card .stat-label {
+            font-size: 0.78rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* ── TABLES ── */
+        .table {
+            color: var(--text-primary);
+        }
+
+        .table thead th {
+            background: #0d1117;
+            border-bottom: 1px solid var(--card-border);
+            color: var(--text-secondary);
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 10px 14px;
+        }
+
+        .table tbody tr {
+            border-bottom: 1px solid #21262d;
+            transition: background 0.1s;
+        }
+
+        .table tbody tr:hover {
+            background: #161b22;
+        }
+
+        .table tbody td {
+            padding: 12px 14px;
+            vertical-align: middle;
+            font-size: 0.875rem;
+        }
+
+        /* ── FORMS ── */
+        .form-control,
+        .form-select {
+            background: #0d1117;
+            border: 1px solid var(--card-border);
+            color: var(--text-primary);
+            border-radius: 6px;
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            background: #0d1117;
+            border-color: var(--sidebar-active);
+            color: var(--text-primary);
+            box-shadow: 0 0 0 3px rgba(31, 111, 235, 0.2);
+        }
+
+        .form-control::placeholder {
+            color: var(--text-muted);
+        }
+
+        .form-label {
+            font-size: 0.82rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin-bottom: 5px;
+        }
+
+        /* ── BUTTONS ── */
+        .btn {
+            font-size: 0.85rem;
+            font-weight: 500;
+            border-radius: 6px;
+        }
+
+        .btn-primary {
+            background: var(--sidebar-active);
+            border-color: var(--sidebar-active);
+        }
+
+        .btn-primary:hover {
+            background: #1a5dd8;
+            border-color: #1a5dd8;
+        }
+
+        .btn-success {
+            background: var(--accent);
+            border-color: var(--accent);
+        }
+
+        .btn-success:hover {
+            background: var(--accent-hover);
+            border-color: var(--accent-hover);
+        }
+
+        /* ── BADGES ── */
+        .badge-dodijeljeno {
+            background: rgba(31, 111, 235, 0.2);
+            color: #58a6ff;
+            border: 1px solid rgba(31, 111, 235, 0.4);
+        }
+
+        .badge-zavrseno {
+            background: rgba(35, 134, 54, 0.2);
+            color: #3fb950;
+            border: 1px solid rgba(35, 134, 54, 0.4);
+        }
+
+        .badge-admin {
+            background: rgba(210, 153, 34, 0.2);
+            color: #e3b341;
+            border: 1px solid rgba(210, 153, 34, 0.4);
+        }
+
+        .badge-radnik {
+            background: rgba(35, 134, 54, 0.18);
+            color: #3fb950;
+            border: 1px solid rgba(35, 134, 54, 0.35);
+        }
+
+        .badge {
+            font-size: 0.72rem;
+            font-weight: 600;
+            padding: 4px 9px;
+            border-radius: 20px;
+        }
+
+        /* ── ALERTS ── */
+        .alert {
+            border-radius: 8px;
+            font-size: 0.87rem;
+            border: 1px solid;
+        }
+
+        .alert-success {
+            background: rgba(35, 134, 54, 0.15);
+            border-color: rgba(35, 134, 54, 0.4);
+            color: #3fb950;
+        }
+
+        .alert-danger {
+            background: rgba(218, 54, 51, 0.15);
+            border-color: rgba(218, 54, 51, 0.4);
+            color: #f85149;
+        }
+
+        .alert-warning {
+            background: rgba(227, 179, 65, 0.15);
+            border-color: rgba(227, 179, 65, 0.4);
+            color: #e3b341;
+        }
+
+        .alert-info {
+            background: rgba(31, 111, 235, 0.15);
+            border-color: rgba(31, 111, 235, 0.4);
+            color: #58a6ff;
+        }
+
+        /* ── MOBILE ── */
+        .hamburger-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--text-primary);
+            font-size: 1.3rem;
+            cursor: pointer;
+            padding: 4px;
+        }
+
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 999;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .sidebar.open {
+                transform: translateX(0);
+            }
+
+            .sidebar-overlay.active {
+                display: block;
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .hamburger-btn {
+                display: flex;
+                align-items: center;
+            }
+
+            .page-content {
+                padding: 16px;
+            }
+
+            .topbar {
+                padding: 14px 16px;
+            }
+        }
+
+        /* ── CODE BADGE ── */
+        .code-badge {
+            font-family: 'Courier New', monospace;
+            background: #21262d;
+            color: #58a6ff;
+            padding: 2px 7px;
+            border-radius: 4px;
+            font-size: 0.78rem;
+            border: 1px solid #30363d;
+        }
+
+        /* ── Page header ── */
+        .page-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .page-header h2 {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin: 0;
+            color: var(--text-primary);
+        }
+
+        .divider {
+            height: 1px;
+            background: var(--card-border);
+            margin: 20px 0;
+        }
+
+        /* ── EMPTY STATE ── */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-muted);
+        }
+
+        .empty-state .bi {
+            font-size: 3rem;
+            display: block;
+            margin-bottom: 12px;
+            opacity: 0.4;
+        }
+    </style>
+    {% block extra_head %}{% endblock %}
+</head>
+
+<body>
+
+    {% if user.is_authenticated %}
+    <!-- Sidebar Overlay (mobile) -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-brand">
+            <div class="brand-icon">
+                <i class="bi bi-box-seam text-white" style="font-size:1.1rem"></i>
+            </div>
+            <h5>SkladišteApp</h5>
+            <small>Sistem upravljanja skladištem</small>
+        </div>
+
+        <nav class="sidebar-nav">
+            <div class="nav-section-title">Pregled</div>
+            <a href="{% url 'dashboard' %}"
+                class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+                <i class="bi bi-speedometer2"></i> Nadzorna ploča
+            </a>
+
+            <div class="nav-section-title">Roba</div>
+            <a href="{% url 'artikli_lista' %}"
+                class="nav-link {% if 'artikli' in request.resolver_match.url_name %}active{% endif %}">
+                <i class="bi bi-boxes"></i> Artikli / Stanje
+            </a>
+            <a href="{% url 'artikal_unos' %}"
+                class="nav-link {% if request.resolver_match.url_name == 'artikal_unos' %}active{% endif %}">
+                <i class="bi bi-plus-circle"></i> Unos robe
+            </a>
+
+            <div class="nav-section-title">Zaduženja</div>
+            <a href="{% url 'zaduzenja_lista' %}"
+                class="nav-link {% if request.resolver_match.url_name == 'zaduzenja_lista' %}active{% endif %}">
+                <i class="bi bi-list-check"></i> Pregled zaduženja
+            </a>
+            <a href="{% url 'zaduzenje_novo' %}"
+                class="nav-link {% if request.resolver_match.url_name == 'zaduzenje_novo' %}active{% endif %}">
+                <i class="bi bi-arrow-right-circle"></i> Izdaj robu
+            </a>
+
+            {% if user.is_admin %}
+            <div class="nav-section-title">Administracija</div>
+            <a href="{% url 'dobavljaci_lista' %}"
+                class="nav-link {% if 'dobavljac' in request.resolver_match.url_name %}active{% endif %}">
+                <i class="bi bi-truck"></i> Dobavljači
+            </a>
+            <a href="{% url 'korisnici_lista' %}"
+                class="nav-link {% if 'korisnici' in request.resolver_match.url_name %}active{% endif %}">
+                <i class="bi bi-people"></i> Korisnici
+            </a>
+            <a href="{% url 'korisnik_novi' %}"
+                class="nav-link {% if request.resolver_match.url_name == 'korisnik_novi' %}active{% endif %}">
+                <i class="bi bi-person-plus"></i> Novi korisnik
+            </a>
+            {% endif %}
+        </nav>
+
+        <div class="sidebar-footer">
+            <div class="user-card">
+                <div class="user-avatar {% if user.is_admin %}avatar-admin{% else %}avatar-radnik{% endif %}">
+                    {{ user.username|first|upper }}
+                </div>
+                <div class="user-info">
+                    <div class="name">{{ user.username }}</div>
+                    <div class="role-badge">
+                        {% if user.is_admin %}👑 Admin{% else %}👷 Radnik{% endif %}
+                    </div>
+                </div>
+                <a href="{% url 'logout' %}" class="text-muted ms-1" title="Odjava"
+                    style="text-decoration:none; font-size:1rem;">
+                    <i class="bi bi-box-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="topbar">
+            <div class="d-flex align-items-center gap-3">
+                <button class="hamburger-btn" id="hamburgerBtn">
+                    <i class="bi bi-list"></i>
+                </button>
+                <h1>{% block page_title %}Nadzorna ploča{% endblock %}</h1>
+            </div>
+            <div class="d-flex align-items-center gap-2">
+                <span class="badge {% if user.is_admin %}badge-admin{% else %}badge-radnik{% endif %}">
+                    {% if user.is_admin %}<i class="bi bi-shield-check me-1"></i>Admin{% else %}<i
+                        class="bi bi-person-badge me-1"></i>Radnik{% endif %}
+                </span>
+            </div>
+        </div>
+
+        <div class="page-content">
+            {% if messages %}
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show mb-3" role="alert">
+                {% if message.tags == 'success' %}<i class="bi bi-check-circle me-2"></i>
+                {% elif message.tags == 'error' or message.tags == 'danger' %}<i
+                    class="bi bi-exclamation-triangle me-2"></i>
+                {% elif message.tags == 'warning' %}<i class="bi bi-exclamation-circle me-2"></i>
+                {% else %}<i class="bi bi-info-circle me-2"></i>
+                {% endif %}
+                {{ message }}
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert"></button>
+            </div>
+            {% endfor %}
+            {% endif %}
+
+            {% block content %}{% endblock %}
+        </div>
+    </div>
+
+    {% endif %}
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('sidebarOverlay');
+        const btn = document.getElementById('hamburgerBtn');
+
+        if (btn) {
+            btn.addEventListener('click', () => {
+                sidebar.classList.toggle('open');
+                overlay.classList.toggle('active');
+            });
+        }
+        if (overlay) {
+            overlay.addEventListener('click', () => {
+                sidebar.classList.remove('open');
+                overlay.classList.remove('active');
+            });
+        }
+
+        // Auto-dismiss alerts after 5s
+        setTimeout(() => {
+            document.querySelectorAll('.alert').forEach(a => {
+                const bsAlert = bootstrap.Alert.getOrCreateInstance(a);
+                bsAlert.close();
+            });
+        }, 5000);
+    </script>
+    {% block extra_scripts %}{% endblock %}
+</body>
+
+</html>

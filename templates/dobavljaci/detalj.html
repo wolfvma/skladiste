@@ -1,0 +1,227 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ dobavljac.naziv_firme }}{% endblock %}
+{% block page_title %}Dobavljač: {{ dobavljac.naziv_firme }}{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h2><i class="bi bi-building me-2"></i>{{ dobavljac.naziv_firme }}</h2>
+    <div class="d-flex gap-2">
+        <a href="{% url 'dobavljac_izmijeni' dobavljac.pk %}" class="btn btn-primary btn-sm">
+            <i class="bi bi-pencil me-1"></i> Izmijeni
+        </a>
+        <a href="{% url 'dobavljaci_lista' %}" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-arrow-left me-1"></i> Nazad
+        </a>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    <!-- Info card -->
+    <div class="col-lg-7">
+        <div class="card h-100">
+            <div class="card-header d-flex align-items-center justify-content-between">
+                <span><i class="bi bi-info-circle me-2"></i>Podaci dobavljača</span>
+                {% if dobavljac.aktivan %}
+                <span class="badge"
+                    style="background:rgba(35,134,54,0.15); color:#3fb950; border:1px solid rgba(35,134,54,0.4);">
+                    <i class="bi bi-circle-fill me-1" style="font-size:0.45rem;"></i>Aktivan
+                </span>
+                {% else %}
+                <span class="badge"
+                    style="background:rgba(218,54,51,0.12); color:#f85149; border:1px solid rgba(218,54,51,0.3);">
+                    Neaktivan
+                </span>
+                {% endif %}
+            </div>
+            <div class="card-body p-4">
+                <div class="row g-3">
+                    {% if dobavljac.kontakt_osoba %}
+                    <div class="col-sm-6">
+                        <div
+                            style="font-size:0.72rem; color:#6e7681; text-transform:uppercase; letter-spacing:.5px; margin-bottom:3px;">
+                            Kontakt osoba</div>
+                        <div style="font-size:0.9rem; font-weight:500;">{{ dobavljac.kontakt_osoba }}</div>
+                    </div>
+                    {% endif %}
+                    {% if dobavljac.telefon %}
+                    <div class="col-sm-6">
+                        <div
+                            style="font-size:0.72rem; color:#6e7681; text-transform:uppercase; letter-spacing:.5px; margin-bottom:3px;">
+                            Telefon</div>
+                        <a href="tel:{{ dobavljac.telefon }}"
+                            style="font-size:0.9rem; color:#58a6ff; text-decoration:none;">
+                            <i class="bi bi-telephone me-1"></i>{{ dobavljac.telefon }}
+                        </a>
+                    </div>
+                    {% endif %}
+                    {% if dobavljac.email %}
+                    <div class="col-sm-6">
+                        <div
+                            style="font-size:0.72rem; color:#6e7681; text-transform:uppercase; letter-spacing:.5px; margin-bottom:3px;">
+                            Email</div>
+                        <a href="mailto:{{ dobavljac.email }}"
+                            style="font-size:0.9rem; color:#58a6ff; text-decoration:none;">
+                            <i class="bi bi-envelope me-1"></i>{{ dobavljac.email }}
+                        </a>
+                    </div>
+                    {% endif %}
+                    {% if dobavljac.grad or dobavljac.adresa %}
+                    <div class="col-sm-6">
+                        <div
+                            style="font-size:0.72rem; color:#6e7681; text-transform:uppercase; letter-spacing:.5px; margin-bottom:3px;">
+                            Adresa</div>
+                        <div style="font-size:0.88rem; color:#e6edf3;">
+                            {% if dobavljac.adresa %}{{ dobavljac.adresa }}<br>{% endif %}
+                            {% if dobavljac.grad %}{{ dobavljac.grad }}, {% endif %}{{ dobavljac.drzava }}
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% if dobavljac.opis %}
+                    <div class="col-12">
+                        <div class="divider"></div>
+                        <div
+                            style="font-size:0.72rem; color:#6e7681; text-transform:uppercase; letter-spacing:.5px; margin-bottom:6px;">
+                            Šta nabavljamo</div>
+                        <div style="font-size:0.88rem; color:#c9d1d9; line-height:1.6;">{{ dobavljac.opis }}</div>
+                    </div>
+                    {% endif %}
+                    {% if dobavljac.napomena %}
+                    <div class="col-12">
+                        <div
+                            style="background:rgba(227,179,65,0.08); border:1px solid rgba(227,179,65,0.3); border-radius:8px; padding:12px;">
+                            <div
+                                style="font-size:0.72rem; color:#e3b341; text-transform:uppercase; letter-spacing:.5px; margin-bottom:5px;">
+                                <i class="bi bi-sticky me-1"></i>Interna napomena
+                            </div>
+                            <div style="font-size:0.88rem; color:#c9d1d9;">{{ dobavljac.napomena }}</div>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="col-lg-5">
+        <div class="row g-3 h-100">
+            <div class="col-6">
+                <div class="card stat-card h-100"
+                    style="background:rgba(31,111,235,0.07); border-color:rgba(31,111,235,0.25);">
+                    <div class="stat-icon" style="background:rgba(31,111,235,0.15);">
+                        <i class="bi bi-boxes" style="color:#58a6ff"></i>
+                    </div>
+                    <div class="stat-value" style="color:#58a6ff">{{ artikli.count }}</div>
+                    <div class="stat-label">Vrsta artikala</div>
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="card stat-card h-100"
+                    style="background:rgba(35,134,54,0.07); border-color:rgba(35,134,54,0.25);">
+                    <div class="stat-icon" style="background:rgba(35,134,54,0.15);">
+                        <i class="bi bi-currency-exchange" style="color:#3fb950"></i>
+                    </div>
+                    <div class="stat-value" style="color:#3fb950; font-size:1.4rem;">
+                        {% if ukupna_vrijednost %}{{ ukupna_vrijednost|floatformat:2 }}{% else %}—{% endif %}
+                    </div>
+                    <div class="stat-label">Ukupno KM (stanje)</div>
+                </div>
+            </div>
+            <div class="col-12">
+                <div class="card h-100" style="background:rgba(13,17,23,0.6);">
+                    <div class="card-body p-3">
+                        <div
+                            style="font-size:0.72rem; color:#6e7681; text-transform:uppercase; letter-spacing:.5px; margin-bottom:8px;">
+                            Brze akcije</div>
+                        <div class="d-flex flex-column gap-2">
+                            <a href="{% url 'dobavljac_izmijeni' dobavljac.pk %}"
+                                class="btn btn-outline-primary btn-sm w-100" style="font-size:0.8rem;">
+                                <i class="bi bi-pencil me-1"></i> Izmijeni podatke
+                            </a>
+                            <a href="{% url 'artikal_unos' %}" class="btn btn-outline-success btn-sm w-100"
+                                style="font-size:0.8rem;">
+                                <i class="bi bi-plus-circle me-1"></i> Unesi artikal od ovog dobavljača
+                            </a>
+                            <a href="{% url 'dobavljac_obrisi' dobavljac.pk %}"
+                                class="btn btn-outline-danger btn-sm w-100" style="font-size:0.8rem;">
+                                <i class="bi bi-trash me-1"></i> Obriši dobavljača
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Artikli od ovog dobavljača -->
+<div class="card">
+    <div class="card-header d-flex align-items-center justify-content-between">
+        <span><i class="bi bi-boxes me-2"></i>Artikli od ovog dobavljača</span>
+        <span style="color:#8b949e; font-size:0.8rem;">{{ artikli.count }} artikala</span>
+    </div>
+    {% if artikli %}
+    <div style="overflow-x:auto;">
+        <table class="table table-borderless mb-0">
+            <thead>
+                <tr>
+                    <th>Broj art.</th>
+                    <th>Šifra</th>
+                    <th>Naziv</th>
+                    <th class="text-center">Stanje</th>
+                    <th class="text-end">Cijena</th>
+                    <th class="text-end">Vrijednost</th>
+                    <th>Datum unosa</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for a in artikli %}
+                <tr>
+                    <td><span class="code-badge">{{ a.random_broj }}</span></td>
+                    <td style="font-size:0.83rem; color:#8b949e;">{{ a.sifra_artikla }}</td>
+                    <td style="font-weight:500; font-size:0.88rem;">{{ a.naziv_artikla }}</td>
+                    <td class="text-center">
+                        <span
+                            style="font-weight:600; {% if a.kolicina == 0 %}color:#f85149{% elif a.kolicina < 5 %}color:#e3b341{% else %}color:#3fb950{% endif %}">
+                            {{ a.kolicina }} kom
+                        </span>
+                    </td>
+                    <td class="text-end" style="color:#8b949e; font-size:0.85rem;">
+                        {% if a.cijena %}{{ a.cijena }} KM{% else %}—{% endif %}
+                    </td>
+                    <td class="text-end" style="font-size:0.85rem; font-weight:500;">
+                        {% if a.cijena %}
+                        <span style="color:#3fb950;">{{ a.ukupna_vrijednost|floatformat:2 }} KM</span>
+                        {% else %}—{% endif %}
+                    </td>
+                    <td style="color:#8b949e; font-size:0.8rem;">{{ a.datum_unosa|date:"d.m.Y" }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+            {% if ukupna_vrijednost %}
+            <tfoot>
+                <tr style="border-top: 2px solid #30363d;">
+                    <td colspan="5" style="font-weight:600; font-size:0.88rem; text-align:right; padding: 12px 14px;">
+                        UKUPNO:
+                    </td>
+                    <td class="text-end" style="font-weight:700; color:#3fb950; font-size:0.95rem; padding: 12px 14px;">
+                        {{ ukupna_vrijednost|floatformat:2 }} KM
+                    </td>
+                    <td></td>
+                </tr>
+            </tfoot>
+            {% endif %}
+        </table>
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <i class="bi bi-inbox"></i>
+        <p class="mb-3">Nema artikala od ovog dobavljača.</p>
+        <a href="{% url 'artikal_unos' %}" class="btn btn-primary btn-sm">
+            <i class="bi bi-plus-circle me-1"></i> Unesi artikal
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

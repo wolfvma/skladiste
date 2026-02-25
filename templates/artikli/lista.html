@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+
+{% block title %}Artikli{% endblock %}
+{% block page_title %}Artikli / Stanje robe{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h2><i class="bi bi-boxes me-2"></i>Lista artikala</h2>
+    <a href="{% url 'artikal_unos' %}" class="btn btn-primary">
+        <i class="bi bi-plus-circle me-1"></i> Unesi artikal
+    </a>
+</div>
+
+<!-- Search -->
+<div class="card mb-3">
+    <div class="card-body py-3">
+        <form method="get" class="d-flex gap-2">
+            <input type="text" name="q" value="{{ q }}" class="form-control"
+                placeholder="Pretraži po nazivu, šifri ili broju artikla...">
+            <button type="submit" class="btn btn-primary px-4">
+                <i class="bi bi-search"></i>
+            </button>
+            {% if q %}
+            <a href="{% url 'artikli_lista' %}" class="btn btn-outline-secondary">
+                <i class="bi bi-x-lg"></i>
+            </a>
+            {% endif %}
+        </form>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        Ukupno: <strong>{{ artikli.count }} artikala</strong>
+        {% if q %} — rezultati za: "<em>{{ q }}</em>"{% endif %}
+    </div>
+    {% if artikli %}
+    <div style="overflow-x:auto;">
+        <table class="table table-borderless mb-0">
+            <thead>
+                <tr>
+                    <th>Broj artikla</th>
+                    <th>Šifra</th>
+                    <th>Naziv artikla</th>
+                    <th class="text-center">Stanje</th>
+                    <th class="text-end">Cijena</th>
+                    <th>Datum unosa</th>
+                    <th>Unio</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for a in artikli %}
+                <tr>
+                    <td><span class="code-badge">{{ a.random_broj }}</span></td>
+                    <td style="font-size:0.83rem; color:#8b949e;">{{ a.sifra_artikla }}</td>
+                    <td>
+                        <span style="font-weight:500;">{{ a.naziv_artikla }}</span>
+                    </td>
+                    <td class="text-center">
+                        <span class="badge"
+                            style="font-size:0.85rem; padding:5px 12px;
+                            {% if a.kolicina == 0 %}background:rgba(218,54,51,0.15); color:#f85149; border:1px solid rgba(218,54,51,0.4);
+                            {% elif a.kolicina < 5 %}background:rgba(227,179,65,0.15); color:#e3b341; border:1px solid rgba(227,179,65,0.4);
+                            {% else %}background:rgba(35,134,54,0.15); color:#3fb950; border:1px solid rgba(35,134,54,0.4);{% endif %}">
+                            {{ a.kolicina }} kom
+                        </span>
+                    </td>
+                    <td class="text-end" style="color:#8b949e; font-size:0.85rem;">
+                        {% if a.cijena %}{{ a.cijena }} KM{% else %}—{% endif %}
+                    </td>
+                    <td style="color:#8b949e; font-size:0.82rem;">
+                        {{ a.datum_unosa|date:"d.m.Y" }}<br>
+                        <span style="color:#6e7681">{{ a.datum_unosa|date:"H:i" }}</span>
+                    </td>
+                    <td style="color:#8b949e; font-size:0.82rem;">{{ a.unio.username }}</td>
+                    <td>
+                        {% if a.kolicina > 0 %}
+                        <a href="{% url 'zaduzenje_novo' %}?artikal={{ a.id }}"
+                            class="btn btn-sm btn-outline-success py-1 px-2" style="font-size:0.75rem;">
+                            <i class="bi bi-arrow-right-circle"></i> Izdaj
+                        </a>
+                        {% else %}
+                        <span style="color:#6e7681; font-size:0.8rem;">Nema na stanju</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <i class="bi bi-inbox"></i>
+        <p class="mb-3">{% if q %}Nema rezultata za "{{ q }}".{% else %}Nema unesenih artikala.{% endif %}</p>
+        {% if not q %}
+        <a href="{% url 'artikal_unos' %}" class="btn btn-primary btn-sm">
+            <i class="bi bi-plus-circle me-1"></i> Unesi prvi artikal
+        </a>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

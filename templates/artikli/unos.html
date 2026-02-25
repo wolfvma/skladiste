@@ -1,0 +1,105 @@
+{% extends 'base.html' %}
+
+{% block title %}Unos robe{% endblock %}
+{% block page_title %}Unos robe{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h2><i class="bi bi-plus-circle me-2"></i>Unesi novi artikal</h2>
+    <a href="{% url 'artikli_lista' %}" class="btn btn-outline-secondary btn-sm">
+        <i class="bi bi-arrow-left me-1"></i> Nazad na listu
+    </a>
+</div>
+
+<div class="row">
+    <div class="col-lg-7 col-xl-6">
+        <div class="card">
+            <div class="card-header">
+                <i class="bi bi-info-circle me-2"></i>Podaci o artiklu
+            </div>
+            <div class="card-body p-4">
+                <div class="alert alert-info mb-4" style="font-size:0.82rem;">
+                    <i class="bi bi-magic me-1"></i>
+                    Sistem će automatski generisati <strong>jedinstveni broj artikla</strong> i upisati datum unosa.
+                </div>
+
+                <form method="post">
+                    {% csrf_token %}
+                    {% for field in form %}
+                    <div class="mb-4">
+                        <label for="{{ field.id_for_label }}" class="form-label">
+                            {{ field.label }}
+                            {% if not field.field.required %}
+                            <span class="text-muted" style="font-weight:400; font-size:0.75rem;">(neobavezno)</span>
+                            {% endif %}
+                        </label>
+                        {{ field }}
+                        {% if field.errors %}
+                        <div class="text-danger mt-1" style="font-size:0.8rem;">
+                            {% for error in field.errors %}{{ error }}{% endfor %}
+                        </div>
+                        {% endif %}
+                        {% if field.help_text %}
+                        <div class="text-muted mt-1" style="font-size:0.78rem;">{{ field.help_text }}</div>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+
+                    <div class="divider"></div>
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary px-4">
+                            <i class="bi bi-check-circle me-1"></i> Sačuvaj artikal
+                        </button>
+                        <a href="{% url 'artikli_lista' %}" class="btn btn-outline-secondary">
+                            Odustani
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-5 col-xl-6 mt-3 mt-lg-0">
+        <div class="card">
+            <div class="card-header"><i class="bi bi-lightbulb me-2"></i>Uputstvo</div>
+            <div class="card-body p-4">
+                <div class="mb-3">
+                    <div class="d-flex align-items-start gap-2 mb-2">
+                        <span style="color:#e3b341; font-size:1rem;">①</span>
+                        <div>
+                            <strong style="font-size:0.85rem;">Šifra artikla</strong>
+                            <p style="color:#8b949e; font-size:0.8rem; margin:2px 0 0;">Interna šifra za identifikaciju
+                                (npr. ART-001, KABEL-5M)</p>
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-start gap-2 mb-2">
+                        <span style="color:#e3b341; font-size:1rem;">②</span>
+                        <div>
+                            <strong style="font-size:0.85rem;">Naziv artikla</strong>
+                            <p style="color:#8b949e; font-size:0.8rem; margin:2px 0 0;">Puni naziv robe koja se unosi u
+                                skladište</p>
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-start gap-2 mb-2">
+                        <span style="color:#e3b341; font-size:1rem;">③</span>
+                        <div>
+                            <strong style="font-size:0.85rem;">Količina</strong>
+                            <p style="color:#8b949e; font-size:0.8rem; margin:2px 0 0;">Broj komada koji dolaze na
+                                skladište</p>
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-start gap-2">
+                        <span style="color:#6e7681; font-size:1rem;">④</span>
+                        <div>
+                            <strong style="font-size:0.85rem;">Cijena <span
+                                    style="color:#6e7681; font-weight:400">(opciono)</span></strong>
+                            <p style="color:#8b949e; font-size:0.8rem; margin:2px 0 0;">Nabavna cijena po komadu u KM
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
